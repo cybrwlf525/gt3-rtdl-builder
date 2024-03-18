@@ -9,12 +9,30 @@ export async function getAchievementPoolFromLinks(
 	links: string[],
 ): Promise<AchievementData[]> {
 	const achievementPool: AchievementData[] = [];
-	for (const link of links) {
+	for (const [index, link] of links.entries()) {
+		console.log(`Processing game ${index + 1} of ${links.length}`);
+
 		const response = await fetchSite(link);
 
 		// console.log("response: ", response);
 		const dom = new JSDOM(response);
 		const document = dom.window.document;
+		const gameInfoPanel = document.querySelector(".game");
+		if (!gameInfoPanel) {
+			console.warn("No game info panel found");
+			continue;
+		}
+		const gameTitleElement = gameInfoPanel.querySelector(".info > h2 > a");
+		if (!gameTitleElement) {
+			console.log(`No game title element found for link ${link}`);
+			continue;
+		}
+		const gameTitle = gameTitleElement.textContent;
+		console.log("gameTitle: ", gameTitle);
+		if (!gameTitle || gameTitle.trim() === "") {
+			console.warn("gameTitle is empty for this game");
+			continue;
+		}
 		const selectedElements = document.querySelectorAll(".ach-panels .nw");
 
 		if (selectedElements) {
@@ -23,14 +41,17 @@ export async function getAchievementPoolFromLinks(
 				if (!titleElement) {
 					continue;
 				}
-				// console.log(titleElement.innerHTML);
+
 				const achievementTitle = titleElement.innerHTML;
 				const achievementLink = `https://www.trueachievements.com${titleElement.href}`;
 				const paragraphElement = selectedElement.querySelector("p");
+
 				if (!paragraphElement) {
 					continue;
 				}
-				const achievementDescription = paragraphElement.innerText;
+
+				const achievementDescription = paragraphElement.innerHTML;
+
 				const progressBarElement =
 					selectedElement.querySelector(".progress-bar");
 				if (!progressBarElement) {
@@ -62,14 +83,21 @@ export async function getAchievementPoolFromLinks(
 						) {
 							continue;
 						}
+						if (!flagTitles.includes("Single Player")) {
+							continue;
+						}
 					}
 				}
-				// console.log("TA Ratio: ", taRatio);
+
+				const taRatioNum = Number(taRatio);
+
 				const achievementData: AchievementData = {
+					gameTitle,
 					description: achievementDescription,
 					link: achievementLink,
 					name: achievementTitle,
-					taRatio: Number(taRatio),
+					taRatio: taRatioNum,
+					pointValue: Number((taRatioNum * 100).toFixed(0)),
 					flagTitles,
 				};
 				achievementPool.push(achievementData);

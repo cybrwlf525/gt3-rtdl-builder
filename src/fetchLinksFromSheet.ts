@@ -3,17 +3,11 @@ import { sheets } from "googleapis/build/src/apis/sheets";
 import { getSpreadsheetByName } from "./getSpreadsheetByName";
 
 export async function fetchLinksFromSheet(
-	sheetsObj: sheets_v4.Sheets,
-	sheetId: string,
+	sheetsObj: sheets_v4.Schema$Spreadsheet,
 ): Promise<string[]> {
 	const links: string[] = [];
-	const response = await sheetsObj.spreadsheets.get({
-		spreadsheetId: sheetId,
-		includeGridData: true,
-	});
-	console.log("Specific spreadsheet retrieved");
-	const spreadsheet = response.data;
-	const mainSheet = getSpreadsheetByName(spreadsheet, "Games for Contest");
+
+	const mainSheet = getSpreadsheetByName(sheetsObj, "Games for Contest");
 	if (!mainSheet) {
 		throw new Error("No sheet named 'Games for Contest' was found.");
 	}
