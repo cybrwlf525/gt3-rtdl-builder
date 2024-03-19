@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "build-new-list": "ts-node src/buildNewList.ts",
+    "check-for-delisted-dlc": "ts-node src/checkForDelistedDLC.ts",
     "typescript-checker": "tsc --noEmit --watch"
   },
   "keywords": [],
