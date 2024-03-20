@@ -6,6 +6,7 @@
   "scripts": {
     "build-new-list": "ts-node src/buildNewList.ts",
     "check-for-delisted-dlc": "ts-node src/checkForDelistedDLC.ts",
+    "check-for-unlocks": "ts-node src/checkForUnlockedAchievements.ts",
     "typescript-checker": "tsc --noEmit --watch"
   },
   "keywords": [],
